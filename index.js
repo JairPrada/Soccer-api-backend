@@ -1,225 +1,12 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const template = `
-<html>
-<head>
-<style>
-body{
-    display:flex;
-    flex-flow: column wrap;
-    justify-content:center;
-    align-items:center;
-    font-family: arial, sans-serif;
-}
-h2{
-    text-align:center;
-  
-}
-table {
-  font-family: arial, sans-serif;
-  border-collapse: collapse;
-  width: 90%;
-  margin:0 auto;
-}
-td, th {
-  border: 1px solid #dddddd;
-  text-align: left;
-  padding: 8px;
-}
-
-tr:nth-child(even) {
-  background-color: #dddddd;
-}
-</style>
-</head>
-<body>
-
-<h2>API FUTBOL COLOMBIANO</h2>
-
-<table>
-  <tr>
-    <th>Descripcion</th>
-    <th>Ruta</th>
-    <th>Verbo</th>
-  </tr>
-  <tr>
-    <td>Ruta para obtener todos los equipos</td>
-    <td>/allteams</td>
-    <td style="color:green;">GET</td>
-  </tr>
-  <tr>
-    <td>Ruta para obtener un equipo</td>
-    <td>/team/[nombre del equipo]</td>
-    <td style="color:green;">GET</td>
-  </tr>
-  <tr>
-    <td>Ruta para eliminar un equipo</td>
-    <td>/team/[nombre del equipo]</td>
-    <td style="color:red;">DELETE</td>
-  </tr>
-  <tr>
-    <td>Ruta para agregar un equipo (debe enviar en el body, name,stars,city)</td>
-    <td>/team</td>
-    <td style="color:blue;">POST</td>
-  </tr>
-  <tr>
-    <td>Para obtener todos los jugadores de un equipo</td>
-    <td>/team/[nombre del equipo]/allplayers</td>
-    <td style="color:green;">GET</td>
-  </tr>
-  <tr>
-    <td>Para obtenerun jugador de un equipo</td>
-    <td>/team/[nombre del equipo]/player/[numero del jugador]</td>
-    <td style="color:green;">GET</td>
-  </tr>
-  <tr>
-    <td>Para eliminar un jugador de un equipo</td>
-    <td>/team/[nombre del equipo]/player/[numero del jugador]</td>
-    <td style="color:red;">DELETE</td>
-  </tr>
-  <tr>
-    <td>Para agregar un jugador de un equipo (debe enviar el nombre del jugador )</td>
-    <td>/team/[nombre del equipo]/player/</td>
-    <td style="color:blue;">POST</td>
-  </tr>
-</table>
-
-</body>
-</html>
-`;
-var teams = [
-  {
-    name: "Millonarios FC",
-    stars: "15",
-    city: "Bogota DC",
-  },
-
-  {
-    name: "Atletico Nacional",
-    stars: "16",
-    city: "Bogota DC",
-  },
-  {
-    name: "América de Cali",
-    stars: "15",
-    city: "Cali",
-  },
-  {
-    name: "Deportivo Cali",
-    stars: "15",
-    city: "Cali",
-  },
-  {
-    name: "Junior",
-    stars: "9",
-    city: "Barranquilla",
-  },
-  {
-    name: "Santa Fe",
-    stars: "9",
-    city: "Bogota DC",
-  },
-  {
-    name: "Medellín",
-    stars: "6",
-    city: "Medellín",
-  },
-  {
-    name: "Once Caldas",
-    stars: "4",
-    city: "Manizales",
-  },
-  {
-    name: "Deportes Tolima",
-    stars: "3",
-    city: "Ibage",
-  },
-  {
-    name: "Deportivo Pasto",
-    stars: "1",
-    city: "Pasto",
-  },
-  {
-    name: "Deportes Quindío",
-    stars: "1",
-    city: "Quindío",
-  },
-  {
-    name: "Cúcuta Deportivo",
-    stars: "1",
-    city: "Cúcuta",
-  },
-  {
-    name: "Unión Magdalena",
-    stars: "1",
-    city: "Barranquilla",
-  },
-  {
-    name: "Boyacá Chicó",
-    stars: "1",
-    city: "Boyacá",
-  },
-];
-var players = [
-  {
-    name: "Millonarios FC",
-    players: ["Juan Moreno", "Macalister Silva"],
-  },
-
-  {
-    name: "Atletico Nacional",
-    players: ["Rifle Andrade", "Baldomero Perlaza"],
-  },
-  {
-    name: "América de Cali",
-    players: ["Duvan vergara", "Adrian Ramos"],
-  },
-  {
-    name: "Deportivo Cali",
-    players: ["Marco Perez", "Angelo Rodirgez"],
-  },
-  {
-    name: "Junior",
-    players: ["Teofilo Rodrigez", "Miguel Borja"],
-  },
-  {
-    name: "Santa Fe",
-    players: ["Andres Castellanos", "Andres Perez"],
-  },
-  {
-    name: "Medellín",
-    players: ["Migel Reina", "Agustin Guletichs"],
-  },
-  {
-    name: "Once Caldas",
-    players: ["Dayro Moreno", "Edwin Velasco"],
-  },
-  {
-    name: "Deportes Tolima",
-    players: ["Hamilton Campaz", "Juan Caicedo"],
-  },
-  {
-    name: "Deportivo Pasto",
-    players: [],
-  },
-  {
-    name: "Deportes Quindío",
-    players: [],
-  },
-  {
-    name: "Cúcuta Deportivo",
-    players: [],
-  },
-  {
-    name: "Unión Magdalena",
-    players: [],
-  },
-  {
-    name: "Boyacá Chicó",
-    players: [],
-  },
-];
+const mongoose = require("mongoose");
+const { template } = require('./template');
+const { teams } = require('./teams');
+const { players } = require('./players');
+const Team = require('./models/team');
+require('./configdb');
 
 const searchPlayers = (equipo) => {
   return players.filter((e) => e.name == equipo)[0].players;
@@ -234,10 +21,11 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send(template);
 });
+
 //? Obtener todos los equipos
 app.get("/allteams", (req, res) => {
   if (teams) {
-    res.json(teams);
+    Team.find({}).then(e => res.json(e))
   } else {
     res.status(404).json({ data: "not found" });
   }
@@ -246,7 +34,9 @@ app.get("/allteams", (req, res) => {
 //? Obtener un equipo
 app.get("/team/:team", (req, res) => {
   const team = req.params.team;
-  res.json(searchTeams(team));
+  Team.find({ name: team })
+    .then(e => res.json(e))
+
 });
 
 //! Eliminar un equipo
