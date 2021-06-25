@@ -56,9 +56,14 @@ tr:nth-child(even) {
     <td style="color:red;">DELETE</td>
   </tr>
   <tr>
-    <td>Ruta para agregar un equipo (debe enviar en el body, name,stars,city)</td>
-    <td>/team</td>
+    <td>Ruta para agregar un equipo</td>
+    <td>/newteam</td>
     <td style="color:blue;">POST</td>
+  </tr>
+  <tr>
+    <td>Para obtener todos los jugadores registrados</td>
+    <td>/allplayers</td>
+    <td style="color:green;">GET</td>
   </tr>
   <tr>
     <td>Para obtener todos los jugadores de un equipo</td>
@@ -66,17 +71,17 @@ tr:nth-child(even) {
     <td style="color:green;">GET</td>
   </tr>
   <tr>
-    <td>Para obtenerun jugador de un equipo</td>
+    <td>Para obtener un jugador de un equipo por su numero</td>
     <td>/team/[nombre del equipo]/player/[numero del jugador]</td>
     <td style="color:green;">GET</td>
   </tr>
   <tr>
-    <td>Para eliminar un jugador de un equipo</td>
+    <td>Para eliminar un jugador de un equipo por su numero</td>
     <td>/team/[nombre del equipo]/player/[numero del jugador]</td>
     <td style="color:red;">DELETE</td>
   </tr>
   <tr>
-    <td>Para agregar un jugador de un equipo (debe enviar el nombre del jugador )</td>
+    <td>Para agregar un jugador de un equipo</td>
     <td>/team/[nombre del equipo]/player/</td>
     <td style="color:blue;">POST</td>
   </tr>
