@@ -1,0 +1,42 @@
+//todos los equipos
+GET  http://localhost:3001/allteams
+###
+//Solo un equipo
+GET  http://localhost:3001/team/Millonarios FC
+###
+// Eliminar un equipo
+DELETE  http://localhost:3001/team/Deportivo Pasto
+###
+//Añadir un equipo
+POST http://localhost:3001/newteam
+Content-Type: application/json
+
+{
+    "name": "Deportivo Pasto",
+    "stars": 1,
+    "city": "Pasto"
+}
+###
+###
+// todos los jugadores
+GET http://localhost:3001/allplayers
+###
+//todos los jugadores de un equipo
+GET http://localhost:3001/team/Millonarios FC/allplayers
+###
+// Obtener un Jugador de un equipo por su numero
+GET http://localhost:3001/team/Millonarios FC/player/10
+###
+DELETE http://localhost:3001/team/Millonarios FC/player/10
+###
+// Añadir un jugador
+POST http://localhost:3001/team/player
+Content-Type: application/json
+
+{
+    "name": "Cristian Arango",
+  "team": "Millonarios FC",
+  "number": 10,
+  "age": 28
+}
+###

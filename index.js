@@ -1,19 +1,11 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const mongoose = require("mongoose");
+require('dotenv').config()
 const { template } = require('./template');
-const { teams } = require('./teams');
-const { players } = require('./players');
 const Team = require('./models/team');
+const Player = require('./models/players');
 require('./configdb');
-
-const searchPlayers = (equipo) => {
-  return players.filter((e) => e.name == equipo)[0].players;
-};
-const searchTeams = (team) => {
-  return teams.filter((e) => e.name == team);
-};
 
 app.use(cors());
 app.use(express.json());
@@ -23,97 +15,120 @@ app.get("/", (req, res) => {
 });
 
 //? Obtener todos los equipos
-app.get("/allteams", (req, res) => {
-  if (teams) {
-    Team.find({}).then(e => res.json(e))
-  } else {
-    res.status(404).json({ data: "not found" });
-  }
+app.get("/allteams", (req, res, next) => {
+
+  Team.find({})
+    .then(e => {
+      res.json(e)
+    })
+    .catch(error => { next(error) })
+
 });
 
 //? Obtener un equipo
 app.get("/team/:team", (req, res) => {
   const team = req.params.team;
   Team.find({ name: team })
-    .then(e => res.json(e))
-
+    .then(e => {
+      res.json(e)
+    })
+    .catch(e => res.status(404).json({ data: "not found" }))
 });
 
 //! Eliminar un equipo
 app.delete("/team/:team", (req, res) => {
   const team = req.params.team;
-  teams.map((e, index) => {
-    if (e.name == team) {
-      console.log(teams.splice(index, 1));
-      players.map((e, index2) => {
-        if (e.name == team) {
-          players.splice(index2, 1);
-        }
-      });
-    }
-  });
-  res.send(searchTeams(team));
+  Team.deleteMany({ name: team })
+    .then(e => {
+      Player.deleteMany({ team: team }).then(e => {
+        res.json({ message: "Delete team and players" })
+      })
+    }).catch(e => next(e))
+
 });
 
 //* Agregar un equipo
-app.post("/team/", (req, res) => {
-  const newTeam = req.body;
-  console.log(newTeam);
-  teams.map((e) => {
-    if (e.name == newTeam) {
-      return res.json({ message: "EL equipo ya esta registrado" });
-    } else {
-      teams.push(newTeam);
-      res.json(teams);
-    }
-  });
+app.post("/newteam/", (req, res, next) => {
+  const newTeamBody = req.body;
+  const newteam = new Team({
+    name: newTeamBody.name,
+    stars: newTeamBody.stars,
+    city: newTeamBody.city
+  })
+  newteam.save()
+    .then(e => {
+      res.json(e)
+    })
+    .catch(e => next(e))
 });
 
 //? Obtener todos los Jugadores de un equipo
-app.get("/team/:team/allplayers", (req, res) => {
+app.get("/team/:team/allplayers", (req, res, next) => {
   const team = req.params.team;
-  res.json(searchPlayers(team));
+  Player.find({ team: team })
+    .then(e => {
+      res.json(e);
+    })
+    .catch(e => next(e))
 });
-
-//? Obtener un Jugador de un equipo
-app.get("/team/:team/player/:number", (req, res) => {
+// ? obtener todos los jugadores
+app.get('/allplayers', (req, res) => {
+  Player.find({})
+    .then(e => {
+      res.json(e);
+    })
+    .catch(e => next(e))
+});
+//? Obtener un Jugador de un equipo por su numero
+app.get("/team/:team/player/:number", (req, res, next) => {
   const team = req.params.team;
   const number = req.params.number;
-  res.json(searchPlayers(team)[number]);
+  Player.find({ team: team, number: number })
+    .then(e => {
+      res.json(e);
+    })
+    .catch(e => {
+      next(e);
+    })
+
 });
 
 //! Eliminar un jugador de un equipo
-app.delete("/team/:team/player/:number", (req, res) => {
-  const number = req.params.number;
+app.delete("/team/:team/player/:number", (req, res, next) => {
+  const number = Number(req.params.number);
   const team = req.params.team;
-  players.map((e) => {
-    if (e.name == team) {
-      console.log(e.players.splice(number, 1));
-    }
-  });
-  res.send(searchPlayers(team));
+  Player.findOneAndRemove({ team: team, number: number })
+    .then(e => {
+      res.json(e)
+    })
+    .catch(e => next(e));
+
 });
 
 //* Agregar un jugador
-app.post("/team/:team/player", (req, res) => {
-  const newPlayer = req.body;
-  const team = req.params.team;
-
-  players.map((e) => {
-    if (e.name == team) {
-      console.log(e);
-      e.players.push(newPlayer.name);
-      return res.json(searchPlayers(team));
-    }
-  });
-  res.json({ message: "Error equipo no existe" });
+app.post("/team/player", (req, res) => {
+  const newPlayer = new Player({
+    name: req.body.name,
+    team: req.body.team,
+    number: req.body.number,
+    age: req.body.age
+  })
+  newPlayer.save()
+    .then(e => {
+      res.json(e);
+    })
+    .catch(e => {
+      next(e);
+    })
 });
 
-app.use((req, res) => {
-  res.status(404).json({ error: "Not found" });
+
+app.use((e, req, res, next) => {
+  console.log(e)
+  res.status(404).json({ error: "Error no encntrado" });
 });
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log("Servidor iniciado por el puerto " + PORT);
 });

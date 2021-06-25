@@ -10,7 +10,7 @@ const playerSchema = new Schema({
 });
 
 const Player = model('player', playerSchema);
-Player.set('toJSON', {
+playerSchema.set('toJSON', {
     transform: (document, object) => {
         object.id = object._id
         delete object._id
@@ -18,4 +18,4 @@ Player.set('toJSON', {
     }
 });
 
-module.exports.Player = Player;
+module.exports = Player;
