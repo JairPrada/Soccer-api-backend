@@ -1,13 +1,18 @@
 const mongoose = require('mongoose');
 const { Schema, model } = mongoose;
+const uniqueValidator = require('mongoose-unique-validator');
 
 const playerSchema = new Schema({
     name: String,
     team: String,
-    number: Number,
+    number: {
+        type: Number,
+        unique: true
+    },
     age: Number,
     position: String
 });
+playerSchema.plugin(uniqueValidator);
 
 const Player = model('player', playerSchema);
 playerSchema.set('toJSON', {

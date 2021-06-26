@@ -1,14 +1,16 @@
+
+// RUTA DE EQUIPOS
 //todos los equipos
-GET  http://localhost:3001/allteams
+GET  http://localhost:3001/teams
 ###
 //Solo un equipo
-GET  http://localhost:3001/team/Millonarios FC
+GET  http://localhost:3001/teams/Millonarios FC
 ###
 // Eliminar un equipo
-DELETE  http://localhost:3001/team/Deportivo Pasto
+DELETE  http://localhost:3001/teams/Deportivo Pasto
 ###
 //Añadir un equipo
-POST http://localhost:3001/newteam
+POST http://localhost:3001/teams
 Content-Type: application/json
 
 {
@@ -18,25 +20,41 @@ Content-Type: application/json
 }
 ###
 ###
+//RUTA DE JUGADORES
 // todos los jugadores
-GET http://localhost:3001/allplayers
+GET http://localhost:3001/players
 ###
 //todos los jugadores de un equipo
-GET http://localhost:3001/team/Millonarios FC/allplayers
+GET http://localhost:3001/players/Millonarios FC
 ###
 // Obtener un Jugador de un equipo por su numero
-GET http://localhost:3001/team/Millonarios FC/player/10
+GET http://localhost:3001/players/Millonarios FC/10
 ###
-DELETE http://localhost:3001/team/Millonarios FC/player/10
+// eliminar a un jugador de un equipo por su numero
+DELETE http://localhost:3001/players/Millonarios FC/10
 ###
 // Añadir un jugador
-POST http://localhost:3001/team/player
+POST http://localhost:3001/players
 Content-Type: application/json
 
 {
-    "name": "Cristian Arango",
+  "name": "Cristian Arango",
   "team": "Millonarios FC",
   "number": 10,
   "age": 28
 }
 ###
+
+// RUTA DE USUARIOS
+//Obtener todos los uusarios
+GET http://localhost:3001/users
+###
+//registrar un nuevo usuario
+POST http://localhost:3001/users
+Content-Type: application/json
+
+{
+  "name":"Jair Prada",
+  "password":"ASDFGHJKLÑ",
+  "email":"jairprada9@gmail.com"
+}

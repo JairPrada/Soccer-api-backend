@@ -90,4 +90,4 @@ tr:nth-child(even) {
 </body>
 </html>
 `;
-module.exports.template = template;
+module.exports = template;
